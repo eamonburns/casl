@@ -284,13 +284,13 @@ pub const Value = union(enum) {
                 },
                 .@"struct" => |str| if (value == .object) {
                     var s: T = undefined;
-                    inline for (str.fields) |field| {
-                        const v: Value = if (value.object.get(field.name)) |v| blk: {
+                    inline for (str.field_names, str.field_types) |field_name, field_type| {
+                        const v: Value = if (value.object.get(field_name)) |v| blk: {
                             if (v == .err) return if (v.err == error.Missing) error.TypeMismatch else return v.err;
                             break :blk v;
                         } else .missing;
 
-                        @field(s, field.name) = v.toType(field.type) catch |err| if (err == error.Missing) {
+                        @field(s, field_name) = v.toType(field_type) catch |err| if (err == error.Missing) {
                             return error.TypeMismatch;
                         } else return err;
                     }

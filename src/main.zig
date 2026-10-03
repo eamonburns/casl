@@ -102,7 +102,7 @@ fn repl(io: Io, gpa: std.mem.Allocator, value: casl.Casl) !void {
     repl: while (try input.takeDelimiter('\n')) |query_str| : (std.debug.print("> ", .{})) {
         _ = arena_instance.reset(.retain_capacity);
 
-        const query = casl.load(gpa, arena, try arena.dupeZ(u8, query_str), "<repl>") catch |err| switch (err) {
+        const query = casl.load(gpa, arena, try arena.dupeSentinel(u8, query_str, 0), "<repl>") catch |err| switch (err) {
             error.OutOfMemory => return error.OutOfMemory,
             error.ParseFailed, error.ExpectFailed => {
                 std.debug.print("error: unable to parse query\n", .{});
